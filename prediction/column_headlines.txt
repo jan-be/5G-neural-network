@@ -1,0 +1,1 @@
+numRowsGnb, numColumnsGnb, numRowsUe, numColumnsUe, gnbTxPower, ueTxPower, centralFrequency, bandwidth, gnbUeDistance, throughput, delay
