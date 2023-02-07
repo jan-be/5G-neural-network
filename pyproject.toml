@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "2022ws-artificial-neural-networks"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{include = "2022ws_artificial_neural_networks"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pandas = "^1.5.3"
+numpy = "^1.24.2"
+jupyter = "^1.0.0"
+matplotlib = "^3.6.3"
+scikit-learn = "^1.2.1"
+ray = {extras = ["tune"], version = "^2.2.0"}
+hyperopt = "^0.2.7"
+tensorboard = "^2.11.2"
+poethepoet = "^0.18.1"
+uvicorn = {extras = ["standard"], version = "^0.20.0"}
+fastapi = "^0.89.1"
+joblib = "^1.2.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poe.tasks]
+addpytorch = "pip install torch --extra-index-url https://download.pytorch.org/whl/cu117"
+webserver = "uvicorn server:app --host 0.0.0.0"
