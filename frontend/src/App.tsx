@@ -4,13 +4,15 @@ import { dummyResponseValues, initialTestValues } from "./types";
 import { getResponse } from "./apiConn";
 
 function App() {
-  const [inputArr, setInputArr] = useState({...initialTestValues});
+  const [textNumInputsObj, setTextNumInputsObj] = useState({...initialTestValues});
   const [predNN, setPredNN] = useState(dummyResponseValues);
   const [predNs3, setPredNs3] = useState(dummyResponseValues);
 
   const send2ApiRequests = () => {
-    getResponse(inputArr, false).then(e => setPredNN(e));
-    getResponse(inputArr, true).then(e => setPredNs3(e));
+    let numOb = Object.fromEntries(Object.entries(textNumInputsObj).map(([key,value]) => ([key, Number(value)])));
+
+    getResponse(numOb, false).then(e => setPredNN(e));
+    getResponse(numOb, true).then(e => setPredNs3(e));
   };
 
   return (
@@ -21,11 +23,11 @@ function App() {
 
         <table>
           <tbody>
-          {Object.entries(inputArr).map(([key, val]) =>
+          {Object.entries(textNumInputsObj).map(([key, val]) =>
             <tr key={key}>
               <td>{key}:</td>
               <td><input type="number" value={val} onChange={e =>
-                setInputArr({...inputArr, [key]: e.target.value})}/></td>
+                setTextNumInputsObj({...textNumInputsObj, [key]: e.target.value})}/></td>
             </tr>)}
           </tbody>
         </table>

@@ -5,6 +5,8 @@ from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
 from dataset_generation import get_ns3_sim_result
+import prediction
+import torch
 
 app = FastAPI()
 
@@ -17,17 +19,19 @@ app.add_middleware(
 )
 
 
-
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
 
+
 def run_nn(params):
-    return "hmm", "hmm", "hmm"
+    hm = prediction.predict(torch.tensor(list(params.values())))
+    return hm[0], hm[1], ""
 
 
 class MyParams(BaseModel):
-    params: Dict[str, str]
+    params: Dict[str, float]
+
 
 @app.post("/predict/{method}")
 def predict(myParams: MyParams, method: str):

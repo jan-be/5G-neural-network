@@ -79,7 +79,7 @@ RUN apt-get clean && \
     rm ns-allinone-3.36.1.tar.bz2 && \
     rm ns-allinone-3.36.1/ns-3.36.1/src/nr-v2.2.tar.bz2
 
-ENV PATH="${PATH}:$/usr/ns3/ns-3.36.1"
+ENV PATH="${PATH}:/usr/ns3/ns-3.36.1"
 
 
 ################# neural network part
@@ -96,8 +96,6 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry install --no-root
 
 RUN poetry run poe addpytorch
-
-ENV PATH="${PATH}:/usr/ns3/ns-3.36.1"
 
 COPY . .
 
