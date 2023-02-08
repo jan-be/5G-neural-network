@@ -1,0 +1,11 @@
+version: "3.8"
+services:
+  5g-nn-backend:
+    build: .
+    ports:
+      - "8000:8000"
+
+  5g-nn-frontend:
+    build: frontend
+    ports:
+      - "80:80"

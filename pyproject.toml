@@ -28,4 +28,4 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poe.tasks]
 addpytorch = "pip install torch --extra-index-url https://download.pytorch.org/whl/cu117"
-webserver = "uvicorn server:app --host 0.0.0.0"
+webserver = "uvicorn webserver:app --host 0.0.0.0"
