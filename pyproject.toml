@@ -2,9 +2,9 @@
 name = "2022ws-artificial-neural-networks"
 version = "0.1.0"
 description = ""
-authors = ["Your Name <you@example.com>"]
+authors = ["Jan Beckschewe <noreply@janbe.eu>"]
 readme = "README.md"
-packages = [{include = "2022ws_artificial_neural_networks"}]
+packages = [{include = "simulator"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -28,4 +28,4 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poe.tasks]
 addpytorch = "pip install torch --extra-index-url https://download.pytorch.org/whl/cu117"
-webserver = "uvicorn webserver:app --host 0.0.0.0"
+webserver = "uvicorn simulator.webserver:app --host 0.0.0.0"

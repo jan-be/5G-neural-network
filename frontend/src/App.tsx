@@ -31,7 +31,7 @@ function App() {
             </tr>)}
           </tbody>
         </table>
-        <button onClick={send2ApiRequests}>Get Response</button>
+        <button onClick={send2ApiRequests}>Run Simulation</button>
       </div>
 
       <div>

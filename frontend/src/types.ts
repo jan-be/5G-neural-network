@@ -11,6 +11,6 @@ export const initialTestValues = {
 }
 
 export const dummyResponseValues = {
-  throughput: "200",
-  delay: "30",
+  throughput: "",
+  delay: "",
 }

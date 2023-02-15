@@ -1,15 +1,17 @@
 from typing import Dict
 
-from fastapi import FastAPI
-from pydantic import BaseModel
-from fastapi.middleware.cors import CORSMiddleware
-
-from dataset_generation import get_ns3_sim_result
-import prediction
 import torch
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
+import simulator.prediction as prediction
+from simulator.dataset_generation import get_ns3_sim_result
 
 app = FastAPI()
 
+# solve the problem of HTTP requests getting blocked because of cross-origin
+# policies in web browsers
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

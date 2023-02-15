@@ -1,10 +1,10 @@
 import multiprocessing
 import random
+import re
 import shlex
 import subprocess as sp
 from abc import ABC
 from dataclasses import dataclass
-import re
 
 
 class Distribution(ABC):
@@ -38,6 +38,11 @@ class Ns3Parameter:
     distribution: any
 
 
+"""
+Array of the parameters that the ns3 simulation supports and the range of
+likely input values to them, including if they are uniformly distributed or
+logarithmically and if they are integers or not
+"""
 ns3_parameters = [
     Ns3Parameter("numRowsGnb", LinearDistribution(1, 8, False)),
     Ns3Parameter("numColumnsGnb", LinearDistribution(1, 8, False)),
@@ -51,7 +56,7 @@ ns3_parameters = [
 ]
 
 
-def generate_random_parameters():
+def generate_random_parameters() -> dict[str, float]:
     param_dict = {}
 
     for params in ns3_parameters:
@@ -60,16 +65,26 @@ def generate_random_parameters():
     return param_dict
 
 
-def stringify_params(params: dict[str, float]):
+def stringify_params(params: dict[str, float]) -> str:
+    """
+    Returns the params as a command line string
+    """
     ns3_input_str = ""
 
     for key, value in params.items():
+        # sanitize keys so that bad actors can't input arbitrary code
+        key = re.sub(r'\W+', '', key)
         ns3_input_str += f" --{key}={value}"
 
     return ns3_input_str
 
 
-def get_ns3_sim_result(params):
+def get_ns3_sim_result(params: dict[str, float]) -> (float, float, str):
+    """
+    Run a true simulation run with ns3
+    :param params: the 9 ns3 input parameters
+    :return: throughput, delay, the raw string given by ns3
+    """
     process = sp.Popen(shlex.split(f'ns3 run "cttc-nr-mimo-demo --useFixedRi {stringify_params(params)}"'),
                        stdout=sp.PIPE,
                        stderr=sp.PIPE, shell=False)
@@ -87,7 +102,12 @@ def get_ns3_sim_result(params):
     return throughput[0], delay[0], raw_ns3_out
 
 
-def run_sim_to_csv(process_name):
+def run_sim_to_csv(process_name: str):
+    """
+    Encapsulates the get_ns3_sim_result but with random parameters and writes
+    the output to a CSV file
+    :param process_name: to identify within the pool of processes
+    """
     print('hello', process_name)
 
     params = generate_random_parameters()
