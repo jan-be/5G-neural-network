@@ -72,6 +72,7 @@ def do_training(config):
     # 200 is already a pretty large number, takes up to an hour.
     # for the one very long run I even chose 2000 epochs, and it ran overnight.
     for i in range(200):
+        train_loss = 0
         for j, item in enumerate(train_loader):
             train_x, train_y = item[:, :9], item[:, 9:]
 
@@ -86,6 +87,7 @@ def do_training(config):
             loss.backward()
 
             optimizer.step()
+            train_loss = loss.item()
 
         permutation = torch.randperm(test_n["data"].size(0))
         samples = test_n["data"][permutation[:1000]]
@@ -102,7 +104,7 @@ def do_training(config):
         joblib.dump(scaler, "my_model/scaler.txt")
         checkpoint = Checkpoint.from_directory("my_model")
 
-        tune.report(mean_accuracy=test_loss, checkpoint=checkpoint)
+        tune.report(train_loss=train_loss, test_loss=test_loss, checkpoint=checkpoint)
 
 
 if __name__ == '__main__':
