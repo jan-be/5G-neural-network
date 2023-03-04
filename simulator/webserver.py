@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 
 import torch
 from fastapi import FastAPI
@@ -26,11 +26,19 @@ def run_nn(api_params: Dict[str, float]):
     return throughput, delay, ""
 
 
+class Ns3Parameter(BaseModel):
+    name: str
+    unit: Optional[str]
+    value: float
+
+
 class InputParams(BaseModel):
-    params: Dict[str, float]
+    params: list[Ns3Parameter]
 
 
 @app.post("/predict/{method}")
 def predict(api_params: InputParams, method: str):
-    throughput, delay, _ = run_nn(api_params.params) if method == "nn" else get_ns3_sim_result(api_params.params)
-    return {"input": api_params.params, "output": {"throughput [MBit/s]": throughput, "delay [ms]": delay}}
+    param_dict = {param.name: param.value for param in api_params.params}
+
+    throughput, delay, _ = run_nn(param_dict) if method == "nn" else get_ns3_sim_result(param_dict)
+    return {"input": api_params.params, "output": [Ns3Parameter(name="throughput", value=throughput, unit="MBit/s"), Ns3Parameter(name="delay", value=delay, unit="ms")]}

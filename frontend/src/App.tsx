@@ -4,15 +4,13 @@ import { dummyResponseValues, initialTestValues } from "./types";
 import { getResponse } from "./apiConn";
 
 function App() {
-  const [textNumInputsObj, setTextNumInputsObj] = useState({...initialTestValues});
+  const [textNumInputsObj, setTextNumInputsObj] = useState([...initialTestValues]);
   const [predNN, setPredNN] = useState(dummyResponseValues);
   const [predNs3, setPredNs3] = useState(dummyResponseValues);
 
   const send2ApiRequests = () => {
-    let numOb = Object.fromEntries(Object.entries(textNumInputsObj).map(([key,value]) => ([key, Number(value)])));
-
-    getResponse(numOb, false).then(e => setPredNN(e));
-    getResponse(numOb, true).then(e => setPredNs3(e));
+    getResponse(textNumInputsObj, false).then(e => setPredNN(e));
+    getResponse(textNumInputsObj, true).then(e => setPredNs3(e));
   };
 
   return (
@@ -23,42 +21,35 @@ function App() {
 
         <table>
           <tbody>
-          {Object.entries(textNumInputsObj).map(([key, val]) =>
-            <tr key={key}>
-              <td>{key}:</td>
-              <td><input type="number" value={val} onChange={e =>
-                setTextNumInputsObj({...textNumInputsObj, [key]: e.target.value})}/></td>
+          {textNumInputsObj.map(param =>
+            <tr key={param.name}>
+              <td style={{textAlign: "right"}}>{param.name}{param.unit ? ` [${param.unit}]` : null}:</td>
+              <td><input type="number" value={param.value ?? ""} onChange={e =>
+                setTextNumInputsObj([...textNumInputsObj.filter(e => e.name !== param.name), {
+                  name: param.name,
+                  unit: param.unit,
+                  value: Number(e.target.value),
+                }])}/></td>
             </tr>)}
           </tbody>
         </table>
         <button onClick={send2ApiRequests}>Run Simulation</button>
       </div>
 
-      <div>
-        <h3>Output neural network prediction</h3>
+      {
+        [{title: "Neural Network", arr: predNN}, {title: "5G-LENA", arr: predNs3}].map(e => <div>
+          <h3>Output {e.title} Prediction</h3>
 
-        <table>
-          <tbody>
-          {Object.entries(predNN).map(([key, val]) => <tr key={key}>
-            <td>{key}:</td>
-            <td>{val}</td>
-          </tr>)}
-          </tbody>
-        </table>
-      </div>
-
-      <div>
-        <h3>Output NS3 prediction</h3>
-
-        <table>
-          <tbody>
-          {Object.entries(predNs3).map(([key, val]) => <tr key={key}>
-            <td>{key}:</td>
-            <td>{val}</td>
-          </tr>)}
-          </tbody>
-        </table>
-      </div>
+          <table>
+            <tbody>
+            {e.arr.map(param => <tr key={param.name}>
+              <td style={{textAlign: "right"}}>{param.name}:</td>
+              <td>{param.value?.toFixed(2)} {param.value ? param.unit : null}</td>
+            </tr>)}
+            </tbody>
+          </table>
+        </div>)
+      }
     </div>
   );
 }
