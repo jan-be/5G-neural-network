@@ -41,4 +41,5 @@ def predict(api_params: InputParams, method: str):
     param_dict = {param.name: param.value for param in api_params.params}
 
     throughput, delay, _ = run_nn(param_dict) if method == "nn" else get_ns3_sim_result(param_dict)
-    return {"input": api_params.params, "output": [Ns3Parameter(name="throughput", value=throughput, unit="MBit/s"), Ns3Parameter(name="delay", value=delay, unit="ms")]}
+    return {"input": api_params.params, "output": [Ns3Parameter(name="throughput", value=throughput, unit="MBit/s"),
+                                                   Ns3Parameter(name="delay", value=delay, unit="ms")]}

@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import './App.css';
-import { dummyResponseValues, initialTestValues } from "./types";
+import { dummyResponseValues, initialTestValues, Ns3Parameter } from "./types";
 import { getResponse } from "./apiConn";
 
 function App() {
@@ -13,6 +13,13 @@ function App() {
     getResponse(textNumInputsObj, true).then(e => setPredNs3(e));
   };
 
+  const onChangeInputValue = (event: ChangeEvent<HTMLInputElement>, param: Ns3Parameter) =>
+    setTextNumInputsObj([...textNumInputsObj.map(e =>
+      e.name === param.name
+        ? {name: param.name, unit: param.unit, value: Number(event.target.value)}
+        : e,
+    )]);
+
   return (
     <div>
       <h1>5G Network Simulator</h1>
@@ -24,12 +31,9 @@ function App() {
           {textNumInputsObj.map(param =>
             <tr key={param.name}>
               <td style={{textAlign: "right"}}>{param.name}{param.unit ? ` [${param.unit}]` : null}:</td>
-              <td><input type="number" value={param.value ?? ""} onChange={e =>
-                setTextNumInputsObj([...textNumInputsObj.filter(e => e.name !== param.name), {
-                  name: param.name,
-                  unit: param.unit,
-                  value: Number(e.target.value),
-                }])}/></td>
+              <td>
+                <input type="number" value={param.value ?? ""} onChange={e => onChangeInputValue(e, param)}/>
+              </td>
             </tr>)}
           </tbody>
         </table>

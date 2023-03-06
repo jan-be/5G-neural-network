@@ -98,13 +98,27 @@ def do_training(config):
         test_loss = loss_function(test_pred_y, test_n["target"][permutation[:1000]]).item()
         test_losses.append(test_loss)
 
+        # Evaluate the accuracy on the true data, not just scaled data.
+        # Assume a sample is accurate at less than 5% off from the correct value.
+        accuracy_arr = full_tensor[-20000:, :]
+
+        inf_accuracy_arr = scaler.inverse_transform(
+            torch.cat((accuracy_arr[:, :9], model(torch.Tensor(scaler.transform(accuracy_arr)[:, :9]))),
+                      1).detach().numpy())
+
+        accuracy_throughput = ((accuracy_arr[:, 9] - inf_accuracy_arr[:, 9]).abs() / accuracy_arr[:, 9] < 0.05)\
+            .long().float().mean().item()
+        accuracy_delay = ((accuracy_arr[:, 10] - inf_accuracy_arr[:, 10]).abs() / accuracy_arr[:, 10] < 0.05)\
+            .long().float().mean().item()
+
         # saving the model state in the ray_results directory
         os.makedirs("my_model", exist_ok=True)
         torch.save((model.state_dict(), optimizer.state_dict()), "my_model/checkpoint.pt")
         joblib.dump(scaler, "my_model/scaler.txt")
         checkpoint = Checkpoint.from_directory("my_model")
 
-        tune.report(train_loss=train_loss, test_loss=test_loss, checkpoint=checkpoint)
+        tune.report(train_loss=train_loss, test_loss=test_loss, accuracy_throughput=accuracy_throughput,
+                    accuracy_delay=accuracy_delay, checkpoint=checkpoint)
 
 
 if __name__ == '__main__':
